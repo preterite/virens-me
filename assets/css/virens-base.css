@@ -1,0 +1,1467 @@
+/* ===================================
+   VIRENS Base Styles
+   Unified CSS for virens.io, verdantinquiry.org, virens.me
+   =================================== */
+
+/* ===== @FONT-FACE DECLARATIONS ===== */
+/* Self-hosted, Latin Pro subset (~296 KB total across 11 files)
+   Subsetting: U+0000-024F, combining diacritics, general punctuation,
+   currency, letterlike symbols, Latin ligatures.
+   No hinting (macOS/iOS ignore embedded hints). */
+
+/* --- Cooper Hewitt (Smithsonian, OFL) ---
+   Role: Headings, navigation, UI elements
+   Geometric sans-serif with humanist warmth */
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-Light.woff2') format('woff2');
+  font-weight: 300; /* Light */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-LightItalic.woff2') format('woff2');
+  font-weight: 300; /* Light Italic */
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-Book.woff2') format('woff2');
+  font-weight: 400; /* Book */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-BookItalic.woff2') format('woff2');
+  font-weight: 400; /* Book Italic */
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-Medium.woff2') format('woff2');
+  font-weight: 500; /* Medium */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-MediumItalic.woff2') format('woff2');
+  font-weight: 500; /* Medium Italic */
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-Bold.woff2') format('woff2');
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('../fonts/CooperHewitt-BoldItalic.woff2') format('woff2');
+  font-weight: 700; /* Bold Italic */
+  font-style: italic;
+  font-display: swap;
+}
+
+/* --- Libre Baskerville (Impallari Type, OFL) ---
+   Role: Body text, long-form reading, blockquotes
+   Transitional serif optimized for screen reading */
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('../fonts/LibreBaskerville-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('../fonts/LibreBaskerville-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('../fonts/LibreBaskerville-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  src: url('../fonts/LibreBaskerville-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* --- JetBrains Mono (JetBrains, OFL) ---
+   Role: Code blocks, metadata, breadcrumbs, technical UI
+   Monospace designed for code readability, with ligatures */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMono-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+  /* Font families — the three pillars */
+  --font-sans: 'Cooper Hewitt', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /* Semantic font roles — themes can override these */
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-serif);
+  /* --font-mono is used directly (no role alias needed) */
+
+  /* Spacing */
+  --gutter: 24px;
+  --gutter-mobile: 16px;
+  --header-height: 320px;
+  
+  /* Layout */
+  --max-width: 1200px;
+  --sidebar-width: 280px;
+  
+  /* Timing */
+  --transition-fast: 0.15s;
+  --transition-medium: 0.3s;
+  
+  /* Content page offsets — clears fixed header + nav.
+     Used by sticky TOC and IntersectionObserver rootMargin. */
+  --toc-offset: 144px; /* compact header (72) + nav (~48) + breathing (24) */
+
+  /* Z-index layers */
+  --z-header: 100;
+  --z-logo: 110;
+  --z-nav: 90;
+  --z-mobile-menu: 200;
+}
+
+/* ===== RESET & BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== SKIP LINK ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ===== HEADER ===== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  overflow: hidden;
+  z-index: var(--z-header);
+  /* Squoosh transitions — all animated properties share timing */
+  transition: height 0.35s ease, padding 0.35s ease;
+}
+
+.header-content {
+  transition: padding 0.35s ease, gap 0.35s ease;
+}
+
+.header-logo {
+  transition: padding 0.35s ease;
+}
+
+.header-logo img {
+  transition: max-height 0.35s ease;
+}
+
+.header-text {
+  transition: padding 0.35s ease;
+}
+
+#site-title {
+  transition: font-size 0.35s ease;
+}
+
+#site-description {
+  transition: opacity 0.35s ease, max-height 0.35s ease, margin 0.35s ease;
+  max-height: 2em;
+  overflow: hidden;
+}
+
+/* Animated gradient background */
+.header-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(
+    270deg,
+    var(--anim-color-1),
+    var(--anim-color-2),
+    var(--anim-color-3),
+    var(--anim-color-2),
+    var(--anim-color-1)
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Header content */
+.header-content {
+  position: relative;
+  z-index: 2;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 40px var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.header-text {
+  flex: 1;
+  padding-top: 20px;
+}
+
+#site-title {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+#site-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#site-description {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* Logo placement */
+.header-logo {
+  position: relative;
+  z-index: var(--z-logo);
+  padding-top: 20px;
+  /* Add subtle glow for visibility */
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
+}
+
+.header-logo img {
+  display: block;
+  max-height: 120px; /* 120px standard across all three VIRENS sites */
+  width: auto;
+  height: auto;
+}
+
+/* ===== NAVIGATION ===== */
+nav {
+  position: relative;
+  z-index: var(--z-nav);
+  border-top: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.nav-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.nav-item a {
+  display: block;
+  padding: 14px 18px;
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
+  font-weight: 500; /* Cooper Hewitt Medium for nav */
+  text-decoration: none;
+  color: var(--color-text);
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.nav-item a:hover {
+  background-color: var(--color-nav-hover);
+  color: var(--color-accent-bright);
+}
+
+.nav-item.active a {
+  background-color: var(--color-nav-active);
+  border-bottom: 3px solid var(--color-accent-bright);
+}
+
+/* Cross-site nav separator */
+.nav-separator {
+  width: 1px;
+  background-color: var(--color-border);
+  margin: 8px 12px;
+}
+
+.nav-crosslink {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.nav-crosslink a {
+  font-weight: 400; /* Cooper Hewitt Book for crosslinks */
+}
+
+/* Mobile hamburger */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* ===== FIXED NAV + SQUOOSH COMPACT STATE ===== */
+/* Site nav becomes fixed below the header. Scoped to .site-nav
+   class to avoid catching .breadcrumbs and .page-nav elements
+   (both are also <nav>). */
+nav.site-nav {
+  position: fixed;
+  top: var(--header-height); /* 320px — slides up on squoosh */
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  /* Must be explicitly opaque — scrolling content passes behind
+     this fixed element. Without this, body text bleeds through. */
+  background-color: var(--color-nav-active);
+  transition: top 0.35s ease;
+}
+
+/* Compact state — desktop only, toggled by JS on scroll.
+   Logotype shrinks, title shrinks, description hides,
+   header collapses to a slim bar. */
+@media (min-width: 768px) {
+  body.header-compact header {
+    height: 72px;
+  }
+
+  body.header-compact .header-content {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    gap: 16px;
+  }
+
+  body.header-compact .header-logo {
+    padding: 4px 10px 8px;
+  }
+
+  body.header-compact .header-logo img {
+    max-height: 40px;
+  }
+
+  body.header-compact .header-text {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  body.header-compact #site-title {
+    font-size: 1.4rem;
+  }
+
+  body.header-compact #site-description {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+  }
+
+  body.header-compact nav.site-nav {
+    top: 72px;
+  }
+
+  /* Adjust main padding when header is compact */
+  body.header-compact main {
+    padding-top: 148px; /* 72 + ~48 + 28 */
+  }
+
+  /* Content page: divider handles clearance, main stays slim */
+  body.header-compact main.layout-content {
+    padding-top: var(--gutter);
+  }
+
+  /* Content page: divider lives outside main, so adjust its
+     clearance instead of main's padding */
+  body.header-compact .page-wrapper > .divider-full-bleed.divider-header {
+    margin-top: 124px; /* compact header (72) + nav (~48) + 4px breathing */
+  }
+}
+
+/* Nav element resets — prevent base nav styles (borders,
+   background) from bleeding into breadcrumbs and page-nav. */
+nav.breadcrumbs,
+nav.page-nav {
+  border-top: none;
+  border-bottom: none;
+  background-color: transparent;
+}
+
+/* ===== BREADCRUMBS ===== */
+.breadcrumbs {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.breadcrumbs-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  color: var(--color-muted);
+}
+
+.breadcrumb-current {
+  color: var(--color-accent-bright);
+  font-weight: 700;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  gap: var(--gutter);
+  padding: var(--gutter);
+  /* Clear the fixed header (320px) + nav (~48px) + breathing (24px) */
+  padding-top: 392px;
+  transition: padding-top 0.35s ease;
+  /* Stacking context below the fixed nav (z-index: 90).
+     Without this, links inside <main> compete with the
+     fixed nav in the root stacking context. */
+  position: relative;
+  z-index: 1;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+aside {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+/* ===== CONTENT PAGE LAYOUT ===== */
+/* Two layout modes: single-column (index pages) and
+   content (reading column + sidebar). Both are block display;
+   the flex layout for content pages lives inside .content-body. */
+
+main.layout-single-column {
+  display: block;
+  max-width: 860px;
+}
+
+main.layout-content {
+  display: block;
+  /* Reduced top padding — the divider above (in page-wrapper flow)
+     already clears the fixed header+nav. Just need breathing room
+     between divider bottom and breadcrumbs. */
+  padding-top: var(--gutter);
+}
+
+/* Flex container for reading column + sidebar.
+   Starts below the divider in content pages. */
+.content-body {
+  display: flex;
+  gap: var(--gutter);
+}
+
+/* Full-bleed utility — breaks out of any centered container
+   to span full viewport width. left: 50% moves the element’s
+   left edge to the center of its containing block; transform:
+   translateX(-50%) pulls it back by half its own 100vw width. */
+.divider-full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Vertical breathing room between page sections.
+   When the divider sits outside <main> (content pages), it needs
+   to clear the fixed header+nav. The 370px matches the fixed chrome
+   height (header 320px + nav ~48px + 2px breathing). */
+.divider-header {
+  margin: 1em 0 0;
+}
+
+/* Content page divider lives outside main in the page-wrapper.
+   It must clear the fixed chrome above it. */
+.page-wrapper > .divider-full-bleed.divider-header {
+  margin-top: 370px;
+  margin-bottom: 0;
+  transition: margin-top 0.35s ease;
+}
+
+/* ===== CONTENT PAGE BREADCRUMBS ===== */
+/* Inside <main>, above page-lede. Scrolls with content. */
+nav.breadcrumbs {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-bottom: 1.5em;
+  padding-bottom: 0.75em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+nav.breadcrumbs a {
+  color: var(--color-muted);
+}
+
+nav.breadcrumbs a:hover {
+  color: var(--color-accent-bright);
+}
+
+.breadcrumb-sep {
+  margin: 0 0.4em;
+  opacity: 0.5;
+}
+
+/* ===== PAGE LEDE ===== */
+/* Title, subtitle, abstract zone above the content divider.
+   h1 inherits font-family from the theme’s h1 rule. */
+.page-lede {
+  margin-bottom: 2em;
+}
+
+.page-lede h1 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+  margin-bottom: 0.3em;
+}
+
+.page-subtitle {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1em;
+  letter-spacing: 0.01em;
+}
+
+.page-abstract {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 680px;
+  margin-bottom: 1.5em;
+}
+
+.page-abstract p {
+  margin-bottom: 0.5em;
+}
+
+.page-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 1em;
+}
+
+/* ===== READING COLUMN ===== */
+/* Max-width constrains line length to 60–75 characters
+   at 1rem Libre Baskerville. ~680px is the sweet spot. */
+.reading-column {
+  max-width: 680px;
+}
+
+.reading-column h2 {
+  margin-top: 2.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--color-border);
+}
+
+.reading-column h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.reading-column h3 {
+  margin-top: 1.5em;
+}
+
+/* ===== CONTENT SIDEBAR ===== */
+aside.content-sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+}
+
+/* Sticky TOC — locks to viewport as user scrolls.
+   --toc-offset accounts for compact header + nav + breathing.
+   Transitions in sync with squoosh. */
+.toc-sticky {
+  position: sticky;
+  top: var(--toc-offset);
+  transition: top 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+/* Section TOC */
+.section-toc {
+  /* No margin-bottom — .toc-sticky flex gap handles spacing */
+}
+
+.section-toc h3 {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin-bottom: 0.75em;
+}
+
+.section-toc ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.section-toc li {
+  margin-bottom: 0.5em;
+  padding-left: 0;
+}
+
+.section-toc a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.section-toc a:hover {
+  color: var(--color-accent-bright);
+}
+
+/* Active section highlight — set by IntersectionObserver */
+.section-toc a.toc-active {
+  color: var(--color-accent-bright);
+  font-weight: 700;
+}
+
+/* Cross-links to related pages */
+.sidebar-crosslinks {
+  /* No margin-bottom — .toc-sticky flex gap handles spacing */
+}
+
+.sidebar-crosslinks h3 {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin-bottom: 0.75em;
+}
+
+.sidebar-crosslinks ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-crosslinks li {
+  margin-bottom: 0.6em;
+}
+
+.sidebar-crosslinks a {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.sidebar-crosslinks a:hover {
+  color: var(--color-accent-bright);
+}
+
+.crosslink-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+/* ===== FOOTNOTES ===== */
+/* Kramdown renders footnotes as <div class="footnotes">
+   with an <ol> inside. Compact scholarly display. */
+.footnotes {
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 2px solid var(--color-border);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.footnotes ol {
+  padding-left: 1.5em;
+  margin: 0;
+}
+
+.footnotes li {
+  margin-bottom: 0.75em;
+}
+
+.footnotes .reversefootnote {
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin-left: 0.25em;
+}
+
+/* Superscript footnote reference in body text */
+sup a.footnote {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-decoration: none;
+  color: var(--color-accent-bright);
+  padding: 0 2px;
+}
+
+sup a.footnote:hover {
+  color: var(--color-link-hover);
+}
+
+/* ===== PAGE NAVIGATION (prev/next) ===== */
+/* Inside .reading-column so it inherits the 680px max-width
+   and aligns its edges with body text. */
+nav.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 2px solid var(--color-border);
+}
+
+nav.page-nav a {
+  text-decoration: none;
+  color: var(--color-text-muted);
+}
+
+nav.page-nav a:hover {
+  color: var(--color-accent-bright);
+}
+
+.page-nav-sep {
+  color: var(--color-border);
+  margin: 0 1em;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 0.75em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-bottom: 1em;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  padding: 2px 6px;
+  background-color: var(--color-code-bg);
+  border-radius: 3px;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 16px;
+  background-color: var(--color-code-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1em;
+  line-height: 1.5;
+}
+
+pre code {
+  padding: 0;
+  background: none;
+}
+
+blockquote {
+  margin: 1.5em 0;
+  padding-left: 1.5em;
+  border-left: 4px solid var(--color-accent-muted);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+ul, ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+li {
+  margin-bottom: 0.5em;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* ===== BLOG CARDS (virens.me) ===== */
+.blog-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent-muted);
+  border-radius: 4px;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: border-left-color var(--transition-medium);
+}
+
+.blog-card:hover {
+  border-left-color: var(--color-accent-bright);
+}
+
+.blog-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.blog-card h3 a {
+  color: var(--color-text);
+}
+
+.blog-card h3 a:hover {
+  color: var(--color-accent-bright);
+}
+
+.blog-card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-bottom: 12px;
+}
+
+.blog-card-excerpt {
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.blog-card-readmore {
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* ===== POST METADATA (virens.me) ===== */
+.post-metadata {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 2px solid var(--color-border);
+}
+
+.post-metadata h4 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin-bottom: 12px;
+}
+
+.metadata-section {
+  margin-bottom: 24px;
+}
+
+.metadata-list {
+  list-style: none;
+  padding: 0;
+}
+
+.metadata-list li {
+  margin-bottom: 8px;
+  font-size: 0.9375rem;
+}
+
+.metadata-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: var(--color-tag-bg);
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  color: var(--color-text);
+}
+
+/* ===== SIDEBAR WIDGETS ===== */
+.sidebar-section {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.sidebar-section h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+
+/* GIF placeholder */
+.gif-placeholder {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+/* Sidebar animated strip — override the full-width stretch.
+   Sidebar GIFs are 150×800 portrait strips. At width:100% they'd
+   upscale to ~248px wide × ~1323px tall, dominating the page.
+   max-width + height:auto lets them sit at natural pixel dimensions
+   (150×800) within the sidebar container. */
+.sidebar-section .threshold-strip {
+  width: auto;
+}
+
+.sidebar-section .threshold-strip canvas,
+.sidebar-section .threshold-strip-static {
+  width: auto;
+  max-width: 100%;
+}
+
+/* GitHub activity widget */
+.github-widget {
+  font-size: 0.875rem;
+}
+
+.github-activity {
+  list-style: none;
+  padding: 0;
+}
+
+.github-activity li {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.github-activity li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.github-commit-msg {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  margin-bottom: 4px;
+}
+
+.github-commit-meta {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+/* Tagline box — small personality aside, not a content element.
+   Deliberately quiet: small mono italic in the tertiary text color
+   so it reads as a wink, not a heading. */
+.tagline-box {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ===== FORMS ===== */
+form label {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 0.9375rem;
+}
+
+form input[type="text"],
+form input[type="email"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 10px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  transition: border-color var(--transition-fast);
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-bright);
+}
+
+button,
+.button {
+  display: inline-block;
+  padding: 10px 24px;
+  font-family: var(--font-heading);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  background-color: var(--color-button-bg);
+  color: var(--color-button-text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+button:hover,
+.button:hover {
+  background-color: var(--color-button-hover);
+  text-decoration: none;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 2px solid var(--color-border);
+  padding: 24px 0;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.footer-content a {
+  color: var(--color-muted);
+}
+
+.footer-content a:hover {
+  color: var(--color-accent-bright);
+}
+
+/* ===== THRESHOLD-SPLIT DIVIDERS ===== */
+/* Animated strips using luminance decomposition.
+   Used for both full-bleed dividers (1200×80 landscape) and
+   sidebar decorative strips (150×800 portrait).
+   The .threshold-strip container holds either a <canvas> (JS enabled,
+   no reduced-motion preference) or a static <img> (fallback).
+   overflow:hidden clips the drifting light layer at the edges.
+   JS sets canvas.style.aspectRatio after loading each GIF so that
+   width:100% + height:auto computes the correct proportional height. */
+
+.threshold-strip {
+  width: 100%;
+  overflow: hidden;           /* clips the drifting light layer */
+  position: relative;
+  line-height: 0;             /* prevent inline spacing artifacts */
+  flex-shrink: 0;             /* don't compress in flex layouts */
+  /* No fixed height — the canvas's aspect-ratio (set by JS after
+     loading) drives the container height via width:100% + height:auto.
+     Dividers (1200×80): ~80px at full viewport width.
+     Sidebar (150×800): ~1322px at ~248px sidebar width. */
+}
+
+.threshold-strip canvas {
+  display: block;
+  width: 100%;
+  height: auto;               /* scale proportionally from intrinsic dimensions */
+  /* Canvas alone doesn't compute height proportionally from intrinsic
+     dimensions the way <img> does. JS sets canvas.style.aspectRatio
+     after loading, which makes width:100% + height:auto work correctly
+     for both landscape dividers and portrait sidebar strips. */
+}
+
+/* Static fallback image — shown when prefers-reduced-motion: reduce
+   or when the JS processing pipeline fails */
+.threshold-strip-static {
+  display: block;
+  width: 100%;
+  height: auto;               /* scale proportionally, like the canvas */
+}
+
+/* ===== LAYER COMPOSITE STRIPS =====
+   Five-layer PNG compositing mode. Unlike GIF-based modes, the canvas
+   is oversized by 6 native pixels per side to provide drift headroom.
+   The container clips via overflow:hidden, and the canvas is positioned
+   via percentage offsets that map the 6px native overshoot to the
+   variable container width.
+
+   Native canvas: 250×450
+   Visible area:  238×438 (250-12 × 450-12)
+   Container AR:  238/438 ≈ 0.5434
+
+   The percentage math:
+     width:  250/238 = 105.042%
+     height: 450/438 = 102.740%
+     left:   -6/238  = -2.521%
+     top:    -6/438  = -1.370%
+*/
+.threshold-strip[data-animation="layers"] {
+  width: 100%;
+  aspect-ratio: 238 / 438;
+  overflow: hidden;
+  position: relative;
+  line-height: 0;
+  border-radius: 4px;
+}
+
+.threshold-strip[data-animation="layers"] canvas {
+  position: absolute;
+  width: 105.042%;
+  height: 102.740%;
+  left: -2.521%;
+  top: -1.370%;
+}
+
+/* Inset border — hides the last 4px of canvas edge on each side.
+   At maximum ±6px drift, a layer's painted edge reaches the
+   container's overflow clip. This pseudo-element paints a 4px
+   border of the card background color over the canvas, providing
+   a safety margin so no PNG edge is ever visible.
+
+   Without this: ~6px overshoot = 0px margin at max drift.
+   With this:    ~6px overshoot − 4px inset = visible area recedes
+                 4px further, so max drift still has 4px hidden. */
+.threshold-strip[data-animation="layers"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 4px var(--color-card-bg);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* When dividers sit between structural sections (header→content,
+   content→footer), remove any vertical margin/gap that would
+   create a visible seam */
+.divider-footer {
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== RESPONSIVE (Mobile) ===== */
+@media (max-width: 767px) {
+  :root {
+    --gutter: var(--gutter-mobile);
+    --header-height: 240px;
+  }
+
+  header {
+    height: var(--header-height);
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px var(--gutter);
+  }
+
+  .header-text {
+    padding-top: 0;
+  }
+
+  #site-title {
+    font-size: 1.75rem;
+  }
+
+  #site-description {
+    font-size: 1rem;
+  }
+
+  .header-logo img {
+    max-width: 200px;
+  }
+
+  /* Mobile nav */
+  nav {
+    position: relative;
+  }
+
+  .hamburger {
+    display: block;
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    z-index: calc(var(--z-mobile-menu) + 1);
+  }
+
+  .nav-list {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-mobile-menu-bg);
+    z-index: var(--z-mobile-menu);
+    padding: 80px 16px 16px;
+    overflow-y: auto;
+  }
+
+  .nav-list.open {
+    display: flex;
+  }
+
+  .nav-item a {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .nav-separator {
+    height: 1px;
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  /* Main layout stacks */
+  main {
+    flex-direction: column;
+  }
+
+  aside {
+    width: 100%;
+    border-top: 2px solid var(--color-border);
+    padding-top: var(--gutter);
+  }
+
+  /* Typography scales down */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+
+  .card,
+  .blog-card {
+    padding: 16px;
+  }
+
+  /* Content page mobile layout */
+  main.layout-content {
+    padding-top: 312px; /* 240 + ~48 + 24 */
+  }
+
+  .content-body {
+    flex-direction: column;
+  }
+
+  aside.content-sidebar {
+    width: 100%;
+    border-top: 2px solid var(--color-border);
+    padding-top: var(--gutter);
+  }
+
+  .toc-sticky {
+    position: static; /* no sticky on mobile */
+  }
+
+  .page-lede h1 {
+    font-size: 1.75rem;
+  }
+
+  /* Mobile nav: fixed header at mobile height */
+  nav.site-nav {
+    top: 240px;
+  }
+
+  /* Dividers scale down gracefully via width:100% + object-fit,
+     but reduce height slightly on small screens */
+  .threshold-strip {
+    height: 60px;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Squoosh: instant state change, no animation */
+  header, .header-content, .header-logo,
+  .header-logo img, .header-text,
+  #site-title, #site-description, nav.site-nav,
+  main, .toc-sticky {
+    transition: none !important;
+  }
+}
+
+/* ===== PRINT ===== */
+@media print {
+  header,
+  nav,
+  aside,
+  footer {
+    display: none;
+  }
+
+  main {
+    max-width: 100%;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+}

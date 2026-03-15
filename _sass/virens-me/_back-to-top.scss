@@ -1,0 +1,124 @@
+// ==========================================================================
+// VIRENS.ME — Back-to-Top Navigation
+// Two complementary affordances:
+//   1. .h2-top-link — clickable zone over the three-verticals accent
+//      mark on every .reading-column h2. Works on all page types.
+//   2. .back-to-top — floating pill, fixed bottom-right, fades in when
+//      the tagline box scrolls out. Content pages with sidebar only.
+//
+// Both are injected by JS (initH2TopLinks, initBackToTopPill).
+// CSS here handles positioning, visibility, and hover states.
+// ==========================================================================
+
+
+// ===== H2 ACCENT-MARK TOP LINK =====
+// An <a> element injected into each .reading-column h2, positioned
+// over the ::before three-verticals zone. Clickable area covers just
+// the accent mark, not the full heading text.
+
+.h2-top-link {
+  position: absolute;
+  left: 0;
+  bottom: calc(0.5em + 1px); // match ::before positioning
+  width: 16px;
+  height: 20px;
+  z-index: 1; // above ::before
+  cursor: pointer;
+  text-decoration: none;
+}
+
+// On hover, brighten the three verticals via :has() — the anchor is
+// a child of h2, and ::before is on the h2 itself. :has() targets the
+// h2 when its child anchor is hovered.
+// Browser support: Chrome 105+, Firefox 121+, Safari 15.4+.
+.reading-column h2:has(.h2-top-link:hover)::before {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 204, 0, 0.9) 0px,
+    rgba(0, 204, 0, 0.9) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+  background-size: 15px 100%;
+  background-repeat: no-repeat;
+}
+
+// Focus-visible for keyboard users — adds outline ring
+.reading-column h2:has(.h2-top-link:focus-visible)::before {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 204, 0, 0.9) 0px,
+    rgba(0, 204, 0, 0.9) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+  background-size: 15px 100%;
+  background-repeat: no-repeat;
+  outline: 2px solid var(--color-accent-bright);
+  outline-offset: 2px;
+}
+
+// Direct focus-visible on the link element itself (fallback if
+// :has() isn't supported — the link is still keyboard-navigable)
+.h2-top-link:focus-visible {
+  outline: 2px solid var(--color-accent-bright);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+
+// ===== FLOATING BACK-TO-TOP PILL =====
+// Fixed bottom-right, styled like a category pill for visual consistency.
+// JS aligns its left edge with the sidebar via --pill-left custom property.
+// IntersectionObserver on the tagline box controls visibility.
+
+.back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  // --pill-left is set by JS to align with sidebar left edge
+  left: var(--pill-left, calc(100vw - 3rem));
+  z-index: 50; // below header (100) and nav (90)
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0.4em 0.7em;
+  background: var(--color-tag-bg);
+  color: var(--color-accent-bright);
+  border: 1px solid rgba(0, 204, 0, 0.2);
+  border-radius: 3px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, background 0.15s ease,
+              border-color 0.15s ease, color 0.15s ease;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: rgba(0, 204, 0, 0.1);
+  border-color: var(--color-accent-bright);
+  color: var(--color-accent-hover);
+}
+
+.back-to-top:focus-visible {
+  outline: 2px solid var(--color-accent-bright);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 1rem;
+    left: auto !important;
+    right: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transition: none;
+  }
+}

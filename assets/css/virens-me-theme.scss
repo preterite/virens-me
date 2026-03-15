@@ -1,0 +1,46 @@
+---
+# Empty front matter triggers Jekyll's Sass compiler.
+# Output: /assets/css/virens-me-theme.css (one HTTP request)
+#
+# Load order in <head>:
+#   1. virens-base.css  (shared plain CSS, all three sites)
+#   2. virens-me-theme.css  (compiled from this file)
+---
+
+// ==========================================================================
+// VIRENS.ME — Compiled Theme
+// Warm mid-gray base (#2a2826), Electric Green accent (#00cc00)
+// JetBrains Mono headings, Libre Baskerville body, Cooper Hewitt nav/UI
+//
+// Partials live in /_sass/virens-me/. This manifest controls load order.
+// When SCSS comes to virens.io and verdantinquiry.org, shared partials
+// (e.g. a future _virens-base.scss) can sit in /_sass/ alongside the
+// per-site directories.
+// ==========================================================================
+
+// Core theme: color system, typography, header, nav, layout, reading column,
+// identity marks, cards, post header, callouts, code blocks, steps,
+// breadcrumbs, page lede, page nav, series nav, CTA links, responsive.
+// Sections 1–18, 20–23 from the original monolithic theme file.
+@import "virens-me/theme-core";
+
+// Sidebar: flow container, section headings, recent posts, layer strip,
+// category nav, GitHub activity, tagline box.
+// Extracted from original section 19 + mockup overrides.
+@import "virens-me/sidebar";
+
+// Pills: .tag-pill border-only variant, .pill-separator between pills.
+// .category-pill lives in theme-core section 13 (used everywhere).
+@import "virens-me/pills";
+
+// Post stream: index page one-liner listing with date grid, category
+// icons (Lucide SVG), and pagination. Page-type: index.
+@import "virens-me/stream";
+
+// Back-to-top: floating pill (content pages), h2 accent-mark top links
+// (all .reading-column pages), :has() hover effects.
+@import "virens-me/back-to-top";
+
+// About page: single-column lede, category cards (six moves), ecosystem
+// grid (three sites), author section, contact grid, colophon.
+@import "virens-me/about";

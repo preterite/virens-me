@@ -1,0 +1,58 @@
+---
+layout: default
+title: Development Blog
+description: "Updates, tutorials, and insights on building VIRENS research tools"
+show_breadcrumbs: false
+---
+
+<h2>Development Blog</h2>
+
+<p style="font-size: 1.125rem; margin-bottom: 2em;">
+  Updates, tutorials, and technical insights on building open-source research tools for humanities scholars.
+</p>
+
+{% for post in paginator.posts %}
+<article class="blog-card">
+  <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+  
+  <div class="blog-card-meta">
+    <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %-d, %Y" }}</time>
+    {% if post.categories.size > 0 %}
+    · {{ post.categories | join: ', ' }}
+    {% endif %}
+  </div>
+  
+  {% if post.excerpt %}
+  <div class="blog-card-excerpt">
+    {{ post.excerpt | strip_html | truncate: 200 }}
+  </div>
+  {% endif %}
+  
+  <div class="blog-card-readmore">
+    <a href="{{ post.url | relative_url }}">Read more →</a>
+  </div>
+</article>
+{% endfor %}
+
+<!-- Pagination -->
+{% if paginator.total_pages > 1 %}
+<nav class="pagination" style="margin-top: 48px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}" class="button">← Newer Posts</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+    
+    <span style="color: var(--color-muted);">
+      Page {{ paginator.page }} of {{ paginator.total_pages }}
+    </span>
+    
+    {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}" class="button">Older Posts →</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}

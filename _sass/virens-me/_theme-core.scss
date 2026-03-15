@@ -1,0 +1,947 @@
+// ==========================================================================
+// VIRENS.ME — Theme Core
+// Sections 1–18, 20–23 from the original monolithic theme.
+// Section 19 (sidebar) extracted to _sidebar.scss.
+//
+// Fixes applied from mockup inline TODOs (session 15c/15d):
+//   - Section 4: #site-description → Baskerville italic
+//   - Section 4: .header-logo img → height: 120px explicit sizing
+//   - Section 4: .header-logo border-image → gray-to-jade gradient
+//   - Section 13: .category-pill:hover → background shift (locked 15d)
+//   - Section 13: .post-categories → margin-bottom: 1em
+// ==========================================================================
+
+
+// ===== 1. COLOR SYSTEM =====
+
+:root {
+  // Background — mid-gray warm
+  --color-bg-dark: #2a2826;            // "Zeus" — Color API — body, header, footer
+  --color-bg-light: #34312c;           // elevated surfaces, cards
+
+  // Text
+  --color-text: #d8d4ce;               // warm off-white (9.95:1 on body)
+  --color-text-muted: #9a9590;         // secondary text (4.95:1 on body)
+  --color-muted: #807b76;              // tertiary, labels, metadata (3.51:1 — AA large)
+
+  // Accent — Electric Green family
+  --color-accent-bright: #00cc00;      // "Electric Green" — Color API — primary accent (6.74:1)
+  --color-accent-muted: #00aa00;       // quieter green for borders, subtle UI (4.72:1)
+  --color-accent-hover: #22dd22;       // hover/focus state (8.00:1)
+
+  // Links
+  --color-link: #00cc00;
+  --color-link-hover: #22dd22;
+
+  // Borders + surfaces
+  --color-border: #443f3a;
+  --color-card-bg: #34312c;
+  --color-card-border: #443f3a;
+  --color-code-bg: #222018;
+  --color-input-bg: #34312c;
+  --color-tag-bg: #383530;
+
+  // Navigation
+  --color-nav-bg: rgba(42, 40, 38, 0.95);  // semi-transparent for scroll-behind
+  --color-nav-hover: #2a2826;               // matches body — distinct from active
+  --color-nav-active: #383530;
+  --color-mobile-menu-bg: #2a2826;
+
+  // Buttons
+  --color-button-bg: #00cc00;
+  --color-button-hover: #22dd22;
+  --color-button-text: #1a1816;        // dark text on green button (8.12:1)
+
+  // Header animation gradient stops
+  --anim-color-1: #262422;
+  --anim-color-2: #353230;
+  --anim-color-3: #444240;
+
+  // Callout box variants
+  --callout-prereq-bg: rgba(0, 204, 0, 0.08);
+  --callout-prereq-border: #00cc00;
+  --callout-warning-bg: rgba(204, 153, 0, 0.08);
+  --callout-warning-border: #cc9900;
+  --callout-warning-text: #e6b800;
+  --callout-tip-bg: rgba(0, 204, 0, 0.06);
+  --callout-tip-border: #00aa00;
+  --callout-note-bg: rgba(154, 149, 144, 0.08);
+  --callout-note-border: #807b76;
+}
+
+
+// ===== 2. BODY + PAGE WRAPPER =====
+
+body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text);
+}
+
+// clip (not hidden) — hidden creates a scroll container that breaks
+// position: sticky on the sidebar TOC. Chrome 90+, Firefox 81+, Safari 16+.
+.page-wrapper {
+  overflow-x: clip;
+}
+
+
+// ===== 3. TYPOGRAPHY =====
+// JetBrains Mono leads on virens.me (all headings) — dev notebook feel.
+// Part of three-site rotation: Baskerville → verdantinquiry,
+// Cooper Hewitt → virens.io, JetBrains Mono → virens.me.
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+h2 {
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  color: var(--color-text);
+}
+
+h3 {
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  margin-top: 1.75em;
+  margin-bottom: 0.5em;
+  color: var(--color-text);
+}
+
+h4 {
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--color-text-muted);
+}
+
+
+// ===== 4. HEADER =====
+
+header {
+  background-color: var(--color-bg-dark);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 1rem 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+// Logo panel — CSS gradient outline box replaces SVG border.
+// The outline SVG logo (devblog-logo-outlines.svg) contains only filled
+// paths; the framing box is handled here in CSS for easy tuning.
+// FIX (15d): Gray-to-jade diagonal gradient — warm gray anchors the
+// left/top, Electric Green anchors the right/bottom. The V mark's
+// green should be the dominant accent; the border frames it warmly.
+.header-logo {
+  position: relative;
+  padding: 6px;
+  background: none;
+  border: 2px solid transparent;
+  border-image: linear-gradient(135deg, #9a9590, #00cc00) 1;
+  border-radius: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+// FIX (15d): Explicit height + width:auto for reliable proportional
+// scaling. max-height alone doesn't force a size when the flex
+// container compresses. 120px matches virens.io and verdantinquiry.
+.header-logo img {
+  height: 120px;
+  width: auto;
+  max-height: none;
+  display: block;
+}
+
+.header-text {
+  padding-top: 0.4em;
+}
+
+// Site title — JetBrains Mono on virens.me (not Cooper Hewitt).
+// Covers both <h1> (index) and <p id="site-title"> (content pages).
+.header-text #site-title,
+.header-text h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.header-text #site-title a,
+.header-text h1 a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+// FIX (15d): Site description in Baskerville italic, not Cooper Hewitt.
+// The tagline "building tools for verdant inquiry" is a humanist
+// sentiment — it should read in the body voice, not the UI voice.
+#site-description {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  color: var(--color-text-muted);
+  margin: 0.25em 0 0 0;
+}
+
+
+// ===== 5. NAVIGATION =====
+// Cooper Hewitt for nav on virens.me (supporting role).
+// Fixes for base CSS typography leaks (session 14a/14i).
+
+.site-nav, nav {
+  background: var(--color-nav-bg);
+  border-bottom: 1px solid var(--color-border);
+  border-top: none;
+}
+
+.site-nav .nav-list {
+  flex-wrap: nowrap;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav .nav-item {
+  margin-bottom: 0;
+}
+
+.nav-item a {
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  padding: 8px 14px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.nav-item a:hover {
+  color: var(--color-accent-bright);
+  background: var(--color-nav-hover);
+}
+
+.nav-item.active a {
+  color: var(--color-accent-bright);
+  background: var(--color-nav-active);
+  border-bottom: none;
+  box-shadow: inset 0 -2px 0 var(--color-accent-bright);
+}
+
+.nav-crosslink a {
+  font-style: italic;
+  color: var(--color-muted) !important;
+}
+
+.nav-crosslink a:hover {
+  color: var(--color-accent-muted) !important;
+}
+
+
+// ===== 6. DIVIDER STRIPS =====
+// virens.me uses data-animation="breathe" (not pixelate like virens.io).
+
+.page-wrapper > .divider-full-bleed.divider-header {
+  margin-top: 355px;
+}
+
+body.header-compact .page-wrapper > .divider-full-bleed.divider-header {
+  margin-top: 109px;
+}
+
+.divider-full-bleed {
+  border-top: 3px solid var(--color-bg-dark);
+  border-bottom: 3px solid var(--color-bg-dark);
+}
+
+.divider-full-bleed .threshold-strip {
+  background-color: var(--color-bg-dark);
+}
+
+.divider-full-bleed .threshold-strip canvas {
+  width: 104%;
+  margin-left: -2%;
+}
+
+
+// ===== 7. COMPACT HEADER (squoosh) =====
+
+body.header-compact header { padding: 0; }
+body.header-compact .header-content { padding: 0.5rem 2rem; }
+body.header-compact .header-logo img { max-height: 48px; height: auto; }
+body.header-compact .header-logo { padding: 3px; }
+body.header-compact #site-title,
+body.header-compact .header-text h1 { font-size: 1.125rem; }
+body.header-compact #site-description { font-size: 0; opacity: 0; margin: 0; }
+body.header-compact .header-animation { opacity: 0.5; }
+
+.header-logo,
+.header-logo img,
+#site-title,
+.header-text h1,
+#site-description,
+.header-animation {
+  transition: all 0.3s ease;
+}
+
+
+// ===== 8. SINGLE-COLUMN PAGE LAYOUT =====
+// Index and about pages use single-column (no sidebar).
+// Content/post pages use base's flex layout with sidebar.
+
+body[data-page-type="index"] main,
+body[data-page-type="about"] main {
+  padding-top: var(--gutter);
+  display: block;
+}
+
+
+// ===== 9. READING COLUMN =====
+// Baskerville body text — shared with virens.io. On virens.me this
+// carries the narrative, conversational blog voice.
+
+.reading-column {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-text);
+  max-width: 680px;
+}
+
+.reading-column p {
+  margin-bottom: 1.25em;
+}
+
+.reading-column a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 204, 0, 0.3);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.reading-column a:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+.reading-column ul,
+.reading-column ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.reading-column li {
+  margin-bottom: 0.5em;
+}
+
+// Inline code in prose — Electric Green tint
+.reading-column code,
+code:not(pre code) {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875em;
+  padding: 0.15em 0.4em;
+  background: rgba(0, 204, 0, 0.08);
+  border: 1px solid rgba(0, 204, 0, 0.15);
+  border-radius: 3px;
+  color: var(--color-accent-hover);
+}
+
+kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125em;
+  padding: 0.1em 0.45em;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  color: var(--color-text);
+}
+
+
+// ===== 10. THREE-VERTICALS ACCENT — virens.me identity mark =====
+// Three vertical lines from the six-lines mark, positioned left of
+// h2 headings. virens.io = box (container), verdantinquiry = three
+// horizontals (scholarship), virens.me = three verticals (code/terminal).
+// Uses ::before with a repeating-linear-gradient to draw 3 bars.
+
+.reading-column h2 {
+  position: relative;
+  padding-left: 1.75rem;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reading-column h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: calc(0.5em + 1px);
+  width: 16px;
+  height: 20px;
+  // Three vertical bars: 2px bar, 3px gap, 2px bar, 3px gap, 2px bar
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 204, 0, 0.45) 0px,
+    rgba(0, 204, 0, 0.45) 2px,
+    transparent 2px,
+    transparent 5px
+  );
+  background-size: 15px 100%;
+  background-repeat: no-repeat;
+  transition: background 0.3s ease;
+}
+
+.reading-column h2:first-child {
+  margin-top: 0;
+}
+
+
+// ===== 11. CARDS =====
+
+.card {
+  position: relative;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 4px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h3 { margin-top: 0; font-size: 1.0625rem; }
+.card p:last-child { margin-bottom: 0; }
+
+
+// ===== 12. BLOG POST CARDS =====
+// Used on index and archive pages for post listings. Lighter weight
+// than documentation cards — date-forward, conversational.
+
+.blog-card {
+  position: relative;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.blog-card:last-child { border-bottom: none; }
+
+.blog-card h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 0.25em 0;
+  line-height: 1.3;
+}
+
+.blog-card h3 a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.blog-card h3 a:hover {
+  color: var(--color-accent-bright);
+}
+
+.blog-card-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  margin-bottom: 0.5em;
+  letter-spacing: 0.01em;
+}
+
+.blog-card-excerpt {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.blog-card-excerpt p { margin: 0; }
+
+.blog-card-readmore {
+  display: inline-block;
+  margin-top: 0.5em;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-accent-bright);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.blog-card-readmore:hover { color: var(--color-accent-hover); }
+
+
+// ===== 13. POST HEADER =====
+// Title block for individual blog posts — date prominent, category
+// pills, reading time. More conversational than virens.io's page-lede.
+
+.post-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-header h1 {
+  margin-bottom: 0.35em;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-bottom: 0.75em;
+}
+
+.post-date {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.post-meta .separator {
+  color: var(--color-border);
+}
+
+.post-reading-time {
+  color: var(--color-muted);
+}
+
+// Category pills — used in post headers, stream items, listing pages.
+// FIX (15d): margin-bottom on container for spacing before abstract.
+.post-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1em;
+}
+
+.category-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  padding: 0.2em 0.65em;
+  background: var(--color-tag-bg);
+  color: var(--color-accent-bright);
+  border: 1px solid rgba(0, 204, 0, 0.2);
+  border-radius: 3px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+// FIX (15d): Background shift to --color-border on hover — reads as
+// a physical button press rather than a text link. Locked in session 15d.
+// text-decoration: none overrides the generic a:hover underline from
+// virens-base.css.
+.category-pill:hover {
+  background: var(--color-border);
+  border-color: var(--color-border);
+  color: var(--color-accent-bright);
+  text-decoration: none;
+}
+
+// Optional post abstract/deck
+.post-abstract {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 1.0625rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+
+// ===== 14. CALLOUT BOXES =====
+
+.callout-box {
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  margin: 1.75rem 0;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+}
+
+.callout-box::before {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.625rem;
+}
+
+.callout-box p { margin: 0 0 0.5em 0; font-size: 0.9375rem; }
+.callout-box p:last-child { margin-bottom: 0; }
+
+.callout-prereq { background: var(--callout-prereq-bg); border-left-color: var(--callout-prereq-border); }
+.callout-prereq::before { content: '◆ Prerequisites'; color: var(--callout-prereq-border); }
+.callout-warning { background: var(--callout-warning-bg); border-left-color: var(--callout-warning-border); }
+.callout-warning::before { content: '⚠ Warning'; color: var(--callout-warning-text); }
+.callout-tip { background: var(--callout-tip-bg); border-left-color: var(--callout-tip-border); }
+.callout-tip::before { content: '→ Tip'; color: var(--callout-tip-border); }
+.callout-note { background: var(--callout-note-bg); border-left-color: var(--callout-note-border); }
+.callout-note::before { content: '● Note'; color: var(--color-text-muted); }
+
+
+// ===== 15. CODE BLOCKS + SYNTAX HIGHLIGHTING =====
+
+.code-block-wrapper {
+  margin: 1.5em 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-code-bg);
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--color-card-bg);
+  border-bottom: 1px solid var(--color-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  letter-spacing: 0.03em;
+}
+
+.code-lang { color: var(--color-accent-muted); }
+
+.copy-button {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.75rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  background: var(--color-nav-hover);
+  color: var(--color-accent-bright);
+  border-color: var(--color-accent-muted);
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border: none;
+  border-radius: 0;
+  overflow-x: auto;
+  background: transparent;
+}
+
+.code-block-wrapper pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: transparent;
+  padding: 0;
+}
+
+// Rouge syntax highlighting — Electric Green palette for mid-gray bg
+.highlight .c, .highlight .c1, .highlight .cm { color: #807b76; font-style: italic; }
+.highlight .k, .highlight .kd, .highlight .kn { color: #00cc00; }
+.highlight .s, .highlight .s1, .highlight .s2 { color: #a8c97a; }
+.highlight .n, .highlight .nx { color: var(--color-text); }
+.highlight .o { color: #9a9590; }
+.highlight .nb { color: #22dd22; }
+.highlight .nf { color: #c9a96e; }
+.highlight .mi, .highlight .mf { color: #b89adf; }
+.highlight .nv, .highlight .vi { color: #7ab8c9; }
+
+
+// ===== 16. STEP SECTIONS =====
+// Numbered procedural steps — less prominent on a blog than virens.io
+// documentation, but still used in tutorial posts.
+
+.step-section {
+  counter-increment: step-counter;
+  position: relative;
+  padding-left: 3.5rem;
+  margin: 2rem 0;
+}
+
+.step-number {
+  font-family: 'JetBrains Mono', monospace;
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 204, 0, 0.1);
+  border: 1px solid var(--color-accent-muted);
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-accent-bright);
+}
+
+.step-section h3 { margin-top: 0; }
+
+
+// ===== 17. BREADCRUMBS =====
+
+.breadcrumbs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.breadcrumbs a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover { color: var(--color-accent-bright); }
+.breadcrumb-sep { margin: 0 0.4em; color: var(--color-muted); }
+.breadcrumb-current { color: var(--color-text); }
+
+
+// ===== 18. PAGE LEDE (fallback for non-post content pages) =====
+
+.page-lede {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-lede h1 { margin-bottom: 0.25em; }
+
+.page-subtitle {
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-weight: 300;
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1em 0;
+  line-height: 1.4;
+}
+
+.page-abstract {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  padding-left: 1em;
+  border-left: 2px solid var(--color-accent-muted);
+}
+
+.page-abstract p { margin: 0; }
+
+.page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.page-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.page-meta .meta-label {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.page-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.doc-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  padding: 0.2em 0.6em;
+  background: var(--color-tag-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+
+
+// ===== 20. PAGE NAV (prev/next) =====
+// (Section 19 — sidebar — extracted to _sidebar.scss)
+
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+}
+
+.page-nav a {
+  color: var(--color-accent-bright);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.page-nav a:hover { color: var(--color-accent-hover); }
+
+
+// ===== 21. SERIES NAV =====
+// Optional series navigation for multi-part blog posts.
+// Rendered when front matter includes series metadata.
+
+.series-nav {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin: 2rem 0;
+}
+
+.series-nav-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0 0 0.5rem 0;
+}
+
+.series-nav ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: series;
+}
+
+.series-nav li {
+  counter-increment: series;
+  margin: 0;
+  padding: 0.2rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+}
+
+.series-nav li::before {
+  content: counter(series) ".";
+  color: var(--color-muted);
+  margin-right: 0.4em;
+  font-size: 0.75rem;
+}
+
+.series-nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.series-nav a:hover { color: var(--color-accent-bright); }
+
+.series-nav .series-current {
+  color: var(--color-accent-bright);
+  font-weight: 700;
+}
+
+
+// ===== 22. CTA LINK =====
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--color-accent-bright);
+  text-decoration: none;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--color-accent-muted);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.cta-link:hover {
+  background: rgba(0, 204, 0, 0.08);
+  border-color: var(--color-accent-bright);
+  color: var(--color-accent-hover);
+}
+
+.cta-link svg { width: 16px; height: 16px; }
+
+.cta-link-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.cta-link-secondary:hover {
+  border-color: var(--color-accent-muted);
+  color: var(--color-accent-bright);
+  background: rgba(0, 204, 0, 0.04);
+}
+
+
+// ===== 23. RESPONSIVE =====
+
+@media (max-width: 768px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0.75rem 1rem;
+  }
+
+  .header-logo img { max-height: 72px; height: auto; }
+
+  .step-section { padding-left: 2.75rem; }
+  .step-number { width: 2rem; height: 2rem; font-size: 0.8125rem; }
+
+  .post-meta { flex-direction: column; gap: 0.5rem; }
+
+  .reading-column h2 { padding-left: 1.5rem; }
+  .reading-column h2::before { width: 13px; height: 17px; }
+}

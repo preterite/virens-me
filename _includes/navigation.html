@@ -1,0 +1,23 @@
+<nav>
+  <div class="nav-container">
+    <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+    
+    <ul class="nav-list">
+      {% for item in site.navigation.main %}
+      <li class="nav-item">
+        <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+      </li>
+      {% endfor %}
+      
+      <li class="nav-separator" aria-hidden="true"></li>
+      
+      {% for item in site.navigation.crosslinks %}
+      <li class="nav-item nav-crosslink">
+        <a href="{{ item.url }}"{% if item.external %} target="_blank" rel="noopener noreferrer"{% endif %}>
+          {{ item.title }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>

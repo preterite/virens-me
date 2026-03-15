@@ -1,0 +1,19 @@
+<header>
+  <div class="header-animation"></div>
+  
+  <div class="header-content">
+    <div class="header-text">
+      <h1 id="site-title">
+        <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      </h1>
+      <p id="site-description">{{ site.tagline }}</p>
+    </div>
+    
+    <div class="header-logo">
+      <img src="{{ site.logo | relative_url }}" 
+           alt="{{ site.title }} logo" 
+           width="{{ site.logo_width }}" 
+           height="{{ site.logo_height }}">
+    </div>
+  </div>
+</header>

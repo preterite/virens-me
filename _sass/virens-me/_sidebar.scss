@@ -1,0 +1,197 @@
+// ==========================================================================
+// VIRENS.ME — Sidebar Components
+// Extracted from theme-core section 19 + mockup overrides.
+//
+// virens.me sidebar scrolls with content (no sticky TOC — that's
+// virens.io's documentation pattern). Composition varies by page type:
+//   - Content/post: recent posts → layer strip → categories → tagline
+//   - Index: github activity → layer strip → categories → tagline
+//
+// Fixes applied from mockup inline TODOs (session 15c/15d):
+//   - .sidebar-section h3 color → --color-accent-muted
+//   - .sidebar-section h3 a linked heading support
+//   - .recent-posts a → Cooper Hewitt (matches category-nav voice)
+//   - .github-commit-msg a → Cooper Hewitt (sidebar nav consistency)
+//   - .sidebar-flow flex container (replaces .toc-sticky from base)
+// ==========================================================================
+
+
+// ===== SIDEBAR FLOW CONTAINER =====
+// Replaces .toc-sticky from virens-base.css which uses position: sticky
+// for the documentation TOC on virens.io. virens.me sidebar scrolls
+// naturally with content.
+
+.sidebar-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
+}
+
+
+// ===== SECTION STRUCTURE =====
+
+.content-sidebar .sidebar-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.content-sidebar .sidebar-section:last-child { border-bottom: none; }
+
+// FIX (15d): Sidebar section headings in subdued green — provides
+// contrast against the muted-gray text below them. The base theme's
+// --color-muted made them disappear into the list items.
+.sidebar-section h3 {
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-muted);
+  margin: 0 0 0.5rem 0;
+}
+
+// Linked headings (e.g. Categories → /categories/ full page).
+// Inherits the green color; hover brightens.
+.sidebar-section h3 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.sidebar-section h3 a:hover {
+  color: var(--color-accent-bright);
+}
+
+
+// ===== RECENT POSTS =====
+
+.recent-posts {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.recent-posts ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recent-posts li {
+  margin: 0;
+  padding: 0.3rem 0;
+}
+
+// FIX (15d): Cooper Hewitt for sidebar nav items — mono is for
+// post titles in the main column stream, not sidebar navigation.
+.recent-posts a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: color 0.15s ease;
+}
+
+.recent-posts a:hover { color: var(--color-accent-bright); }
+
+.recent-posts .post-date-small {
+  display: block;
+  font-size: 0.6875rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-muted);
+  margin-top: 0.1em;
+}
+
+
+// ===== CATEGORY NAV =====
+// Left-border accent on hover matches the three-verticals identity.
+
+.category-nav {
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.category-nav ul { list-style: none; padding: 0; margin: 0; }
+.category-nav li { margin: 0; }
+
+.category-nav a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0 0.3rem 0.75rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.category-nav a:hover {
+  color: var(--color-accent-bright);
+  border-left-color: var(--color-accent-muted);
+}
+
+.category-nav .cat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  color: var(--color-muted);
+}
+
+
+// ===== GITHUB ACTIVITY =====
+// Commit feed widget for the index page sidebar.
+
+.github-activity {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.github-activity li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(68, 63, 58, 0.5);
+  margin: 0;
+}
+
+.github-activity li:last-child { border-bottom: none; }
+
+// FIX (15d): Cooper Hewitt for commit messages — sidebar nav items
+// use the UI typeface consistently. JetBrains Mono stays for metadata
+// (dates, repo names) below.
+.github-commit-msg a {
+  font-family: 'Cooper Hewitt', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  line-height: 1.3;
+  transition: color 0.15s ease;
+}
+
+.github-commit-msg a:hover { color: var(--color-accent-bright); }
+
+.github-commit-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  color: var(--color-muted);
+  margin-top: 0.1em;
+}
+
+
+// ===== TAGLINE BOX =====
+
+.tagline-box {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--color-muted);
+  padding: 12px;
+  border: 1px dotted var(--color-border);
+  border-radius: 3px;
+  text-align: center;
+  min-height: 2.5em;
+}
+
+.tagline-box p { margin: 0; }

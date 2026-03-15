@@ -1,0 +1,100 @@
+# VIRENS.ME Jekyll Configuration
+# Development blog
+
+# Site settings
+title: "VIRENS Development"
+tagline: "building tools for verdant inquiry"
+description: "Development blog for the VIRENS research workflow system. Updates, tutorials, and technical insights for humanities computing."
+url: "https://virens.me"
+baseurl: ""
+
+# Site identity
+site_type: "virens-me"
+logo: "/assets/img/virens-logo.svg"
+logo_width: 296
+logo_height: 222
+
+# Author
+author:
+  name: "Mike Edwards"
+  email: "dev@virens.me"
+  url: "https://preterite.net"
+
+# Build settings
+markdown: kramdown
+
+# Sass/SCSS
+# Partials in _sass/virens-me/; manifest at assets/css/virens-me-theme.scss.
+# virens-base.css stays plain CSS (shared across all three sites).
+# Switch style to 'compressed' for production builds.
+sass:
+  sass_dir: _sass
+  style: expanded
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    
+permalink: /:year/:month/:title/
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
+
+# Pagination
+paginate: 10
+paginate_path: "/page/:num/"
+
+# Navigation
+navigation:
+  main:
+    - title: "Home"
+      url: "/"
+    - title: "Archive"
+      url: "/archive/"
+    - title: "Tags"
+      url: "/tags/"
+    - title: "About"
+      url: "/about/"
+
+  
+  crosslinks:
+    - title: "Theory & Method →"
+      url: "https://verdantinquiry.org"
+      external: true
+    - title: "Tools & Docs →"
+      url: "https://virens.io"
+      external: true
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-paginate
+
+# Feed
+feed:
+  path: atom.xml
+
+# GitHub
+github:
+  repository: preterite/SRE
+  branch: main
+
+# Social
+social:
+  github: preterite/SRE
+
+# Post defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      show_metadata: true

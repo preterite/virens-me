@@ -1,0 +1,149 @@
+// ==========================================================================
+// VIRENS.ME — Post Stream (Index Page)
+// One-liner post listing with date-left grid, category icons (Lucide SVG),
+// and pagination. Used on body[data-page-type="index"].
+//
+// Each stream item is a CSS grid:
+//   Left column:  date (JetBrains Mono, muted) spanning all rows
+//   Right column: title → description → icon + category pill
+//
+// The description uses the post's meta description from front matter —
+// zero additional content work.
+// ==========================================================================
+
+
+// ===== CATEGORY ICONS =====
+// Six Lucide icons (ISC license), one per move-based category.
+// Rendered at 12px inline with category pills.
+// Color inherits from --color-muted.
+
+// Hide the <svg> definitions block (referenced inline per item)
+.icon-defs { display: none; }
+
+.listing-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--color-muted);
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.25em;
+  position: relative;
+  top: -1px; // optical nudge to align with pill text
+}
+
+
+// ===== POST STREAM =====
+
+.post-stream {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stream-item {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.75rem;
+}
+
+.stream-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+// Date in left column, spans all three rows (title, desc, category)
+.stream-date {
+  grid-row: 1 / 4;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  padding-top: 0.15em; // align with title baseline
+}
+
+.stream-title {
+  grid-column: 2;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: 0 0 0.2rem 0;
+}
+
+.stream-title a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.stream-title a:hover {
+  color: var(--color-accent-bright);
+}
+
+// Description — one-sentence summary from front matter meta description.
+// Slightly shorter than full column width so text breaks cleanly.
+.stream-desc {
+  grid-column: 2;
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: calc(100% - 2.5rem);
+  margin: 0.15rem 0 0 0;
+}
+
+// Category line — icon + pill on their own row below description
+.stream-category {
+  grid-column: 2;
+  margin-top: 0.3rem;
+}
+
+
+// ===== INDEX PAGE LAYOUT OVERRIDE =====
+// The divider GIF already provides visual separation from the nav.
+// Default layout-content padding-top is too generous for an index
+// page that should start immediately.
+
+body[data-page-type="index"] main.layout-content {
+  padding-top: 0.75rem;
+}
+
+
+// ===== PAGINATION =====
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+}
+
+.pagination-current {
+  color: var(--color-muted);
+}
+
+.pagination-next {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.pagination-next:hover {
+  color: var(--color-accent-bright);
+}
+
+
+// ===== RESPONSIVE =====
+
+@media (max-width: 768px) {
+  .stream-title { font-size: 0.9375rem; }
+  .stream-desc { display: block; margin-top: 0.25rem; }
+}

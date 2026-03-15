@@ -1,0 +1,35 @@
+---
+layout: default
+title: Archive
+description: "Complete archive of VIRENS development blog posts"
+---
+
+<h2>Archive</h2>
+
+<p>All {{ site.posts | size }} posts, organized by date.</p>
+
+{% assign postsByYear = site.posts | group_by_exp:"post", "post.date | date: '%Y'" %}
+
+{% for year in postsByYear %}
+<div class="card">
+  <h3>{{ year.name }}</h3>
+  
+  {% assign postsByMonth = year.items | group_by_exp:"post", "post.date | date: '%B'" %}
+  
+  {% for month in postsByMonth %}
+  <h4 style="margin-top: 1.5em; margin-bottom: 0.75em; font-size: 1.125rem;">{{ month.name }}</h4>
+  
+  <ul style="list-style: none; padding: 0;">
+    {% for post in month.items %}
+    <li style="margin-bottom: 0.75em; padding-bottom: 0.75em; border-bottom: 1px solid var(--color-border);">
+      <a href="{{ post.url | relative_url }}" style="font-weight: 600;">{{ post.title }}</a><br>
+      <small style="color: var(--color-muted); font-family: var(--font-mono);">
+        {{ post.date | date: "%B %-d, %Y" }}
+        {% if post.categories.size > 0 %} · {{ post.categories | join: ', ' }}{% endif %}
+      </small>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endfor %}
+</div>
+{% endfor %}
