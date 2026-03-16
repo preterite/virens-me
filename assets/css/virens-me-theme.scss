@@ -16,31 +16,36 @@
 // When SCSS comes to virens.io and verdantinquiry.org, shared partials
 // (e.g. a future _virens-base.scss) can sit in /_sass/ alongside the
 // per-site directories.
+//
+// Uses @use instead of @import (Dart Sass 3.0 migration).
+// Since all partials output plain CSS via custom properties (no Sass
+// variables cross-referenced between partials), @use is a drop-in
+// replacement here.
 // ==========================================================================
 
 // Core theme: color system, typography, header, nav, layout, reading column,
 // identity marks, cards, post header, callouts, code blocks, steps,
 // breadcrumbs, page lede, page nav, series nav, CTA links, responsive.
-// Sections 1–18, 20–23 from the original monolithic theme file.
-@import "virens-me/theme-core";
+// Sections 1-18, 20-23 from the original monolithic theme file.
+@use "virens-me/theme-core";
 
 // Sidebar: flow container, section headings, recent posts, layer strip,
 // category nav, GitHub activity, tagline box.
 // Extracted from original section 19 + mockup overrides.
-@import "virens-me/sidebar";
+@use "virens-me/sidebar";
 
 // Pills: .tag-pill border-only variant, .pill-separator between pills.
 // .category-pill lives in theme-core section 13 (used everywhere).
-@import "virens-me/pills";
+@use "virens-me/pills";
 
 // Post stream: index page one-liner listing with date grid, category
 // icons (Lucide SVG), and pagination. Page-type: index.
-@import "virens-me/stream";
+@use "virens-me/stream";
 
 // Back-to-top: floating pill (content pages), h2 accent-mark top links
 // (all .reading-column pages), :has() hover effects.
-@import "virens-me/back-to-top";
+@use "virens-me/back-to-top";
 
 // About page: single-column lede, category cards (six moves), ecosystem
 // grid (three sites), author section, contact grid, colophon.
-@import "virens-me/about";
+@use "virens-me/about";
