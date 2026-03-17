@@ -1,0 +1,50 @@
+<!-- SIDEBAR — INDEX PAGE
+     GitHub activity (top), layer strip, categories, tagline.
+     No "Recent Posts" — the main column IS the post stream. -->
+<div class="sidebar-flow">
+
+  <!-- GitHub Activity -->
+  <div class="sidebar-section">
+    <h3>Recent Activity</h3>
+    <ul id="github-activity" class="github-activity" data-repo="{{ site.github.repository }}">
+      <li>Loading recent commits...</li>
+    </ul>
+    <p style="font-size: 0.8125rem; margin-top: 0.75rem;">
+      <a href="https://github.com/{{ site.github.repository }}"
+         target="_blank" rel="noopener noreferrer"
+         style="color: var(--color-text-muted); text-decoration: none; font-family: 'JetBrains Mono', monospace;">GitHub &rarr;</a>
+    </p>
+  </div>
+
+  <!-- Layer strip — 5-layer PNG composite animation -->
+  <div class="sidebar-section">
+    <div class="threshold-strip"
+         data-animation="layers"
+         data-speed="slow"
+         data-kit-path="assets/img/layer-kits/"
+         data-kit-count="10"><canvas></canvas></div>
+  </div>
+
+  <!-- Categories -->
+  <div class="sidebar-section category-nav">
+    <h3><a href="{{ '/categories/' | relative_url }}">Categories</a></h3>
+    <ul>
+      {% for category in site.categories %}
+      <li>
+        <a href="{{ '/categories/' | relative_url }}#{{ category[0] | slugify }}">
+          {{ category[0] }} <span class="cat-count">{{ category[1].size }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+
+</div>
+
+<!-- Tagline box — outside .toc-sticky so it scrolls naturally to the
+     page bottom rather than being clipped by the sticky container edge.
+     Also serves as the IntersectionObserver sentinel for initBackToTopPill(). -->
+<div class="tagline-box sidebar-section">
+  <p id="tagline-text"></p>
+</div>

@@ -351,10 +351,40 @@ function boostGreen(canvas, width, height, factor) {
    These are separate from the GIF-based utilities above because layers
    mode works with pre-rendered PNG kits, not processed GIFs. */
 
+/**
+ * Constrain drift to ±6px — the overflow clip budget.
+ *
+ * The container clips 6 native pixels per side (via CSS percentage
+ * positioning). Any drift beyond ±6 would reveal blank canvas edge.
+ * Clamping events are rare (requires two harmonics to peak simultaneously)
+ * and the discontinuity is imperceptible at these slow speeds.
+ *
+ * JS CONCEPT: Math.max/Math.min chained together form a "clamp"
+ * function. Equivalent to CSS clamp() but in JS. Forces the value
+ * into [-6, 6].
+ *
+ * @param {number} value - Raw drift in native pixels
+ * @returns {number} Clamped to [-6, 6]
+ */
 function clampDrift(value) {
   return Math.max(-6, Math.min(6, value));
 }
 
+/**
+ * Load a single PNG layer and return an offscreen canvas.
+ *
+ * Similar to loadAndExtract() used by GIF modes, but simpler — we don't
+ * need to extract pixel data for processing. We just need the image on
+ * an offscreen canvas for fast drawImage() blitting in the render loop.
+ *
+ * JS CONCEPT: Offscreen canvas pattern. Drawing canvas→canvas is
+ * GPU-accelerated; drawing Image→canvas requires re-decode each frame
+ * on some browsers. The offscreen canvas acts as a pre-decoded pixel
+ * buffer.
+ *
+ * @param {string} src - URL to PNG file
+ * @returns {Promise<HTMLCanvasElement>} Offscreen canvas with image drawn
+ */
 async function loadLayerImage(src) {
   const img = await new Promise((resolve, reject) => {
     const image = new Image();
@@ -371,6 +401,22 @@ async function loadLayerImage(src) {
   return offscreen;
 }
 
+/**
+ * Load a complete five-layer kit from a directory path.
+ *
+ * Each kit directory contains five PNGs: layer_E.png through layer_D.png.
+ * All five are loaded in parallel via Promise.all, then assembled into
+ * a keyed object for the render function to reference by layer name.
+ *
+ * JS CONCEPT: Promise.all runs all five image loads concurrently
+ * rather than sequentially. On a local server with 18KB PNGs, the
+ * difference is negligible — but the pattern is correct for network
+ * loads where parallelism matters. Object.fromEntries converts the
+ * array of [key, value] pairs back into a { E, A, B, C, D } object.
+ *
+ * @param {string} kitPath - Full URL path to kit directory (trailing slash required)
+ * @returns {Promise<Object>} { E, A, B, C, D } — offscreen canvases
+ */
 async function loadKit(kitPath) {
   const names = ['E', 'A', 'B', 'C', 'D'];
   const entries = await Promise.all(
@@ -768,8 +814,31 @@ function renderGrain(state) {
 }
 
 
-/* ===== LAYERS MODE PROCESSING ===== */
+/* ===== LAYERS MODE PROCESSING =====
+   Five-layer PNG compositing. Unlike the GIF-based modes above, this mode
+   loads pre-rendered PNG kits (five layers per kit) and composites them
+   with per-layer blend modes and drift choreography.
 
+   Each site variant (dark/mid/light) has 10 kits with 5 greener + 5 grayer
+   color profiles. The kit selection is random per page load, matching the
+   random GIF selection pattern used by divider strips. */
+
+/**
+ * Build the path to a randomly selected layer kit.
+ *
+ * Reads data attributes from the container:
+ *   data-kit-path   — relative path to kit directory (default: "assets/img/layer-kits/")
+ *   data-kit-count  — number of kits available (default: 10)
+ *
+ * Kit directories are named kit_001 through kit_NNN, zero-padded to 3 digits.
+ *
+ * JS CONCEPT: String.padStart(3, '0') zero-pads a number to a fixed width.
+ * "1".padStart(3, '0') → "001", "10".padStart(3, '0') → "010".
+ * This matches the Python generator's naming convention.
+ *
+ * @param {HTMLElement} container - The .threshold-strip element
+ * @returns {string} Full URL path to kit directory (with trailing slash)
+ */
 function randomKitPath(container) {
   const path = container.dataset.kitPath || 'assets/img/layer-kits/';
   const count = parseInt(container.dataset.kitCount, 10) || 10;
@@ -778,16 +847,33 @@ function randomKitPath(container) {
   return `${ASSET_ROOT}${path}kit_${padded}/`;
 }
 
+/**
+ * Process a layers-mode strip: pick a random kit, load five PNGs,
+ * set up the compositing canvas.
+ *
+ * The canvas is sized to the native layer dimensions (250×450 from
+ * the generator). CSS handles scaling to the container width via
+ * percentage-based positioning (see virens-base.css).
+ *
+ * @param {HTMLElement} container - The .threshold-strip[data-animation="layers"] element
+ * @returns {Promise<Object>} State object for the animation loop
+ */
 async function processLayers(container) {
   const kitPath = randomKitPath(container);
   const layers = await loadKit(kitPath);
 
+  /* Use layer E's dimensions as the canvas native size.
+     All five layers in a kit share the same dimensions (250×450). */
   const width = layers.E.width;
   const height = layers.E.height;
 
   const canvas = container.querySelector('canvas');
   canvas.width = width;
   canvas.height = height;
+  /* Unlike GIF modes, the layers canvas does NOT set aspect-ratio inline.
+     The container's CSS aspect-ratio (238/438) and the canvas's percentage
+     positioning handle the sizing. See the [data-animation="layers"] rules
+     in virens-base.css. */
 
   return {
     mode: 'layers',
@@ -797,12 +883,25 @@ async function processLayers(container) {
     width,
     height,
     kitPath,
-    t: Math.random() * 100,
+    t: Math.random() * 100,  /* random start — no two loads match */
     timeIncrement: resolveSpeed(container),
     visible: false,
     ready: true
   };
 }
+
+
+/* ===== LAYERS MODE RENDER =====
+   Composites all five layers each frame with current alpha, drift,
+   and blend mode. Mirrors the render function from layers-test.html
+   but without the monitoring display updates.
+
+   Compositing order (bottom to top):
+     E — static substrate at 100% alpha
+     A — diagonal mosaic, Lissajous drift, source-over
+     B — grain texture, no drift, multiply (darkens nonlinearly)
+     C — vertical stripes, vertical shimmy, screen (adds light)
+     D — dot grid, gentle elliptical float, source-over */
 
 function renderLayers(state) {
   const { ctx, layers, width, height } = state;
@@ -811,10 +910,15 @@ function renderLayers(state) {
 
   ctx.clearRect(0, 0, width, height);
 
+  /* E — static substrate, always full opacity, no drift */
   ctx.globalAlpha = 1.0;
   ctx.globalCompositeOperation = 'source-over';
   ctx.drawImage(layers.E, 0, 0);
 
+  /* A — primary drifter.
+     Two-harmonic Lissajous path on both axes — slowly wandering
+     diagonal that never exactly repeats. The E×A interference
+     (diagonal mosaic crossing horizontal bands) is the core visual. */
   ctx.globalCompositeOperation = cfg.A.blendMode;
   const aA = cfg.A.alpha.base
     + cfg.A.alpha.amplitude * Math.sin(t * cfg.A.alpha.frequency + cfg.A.alpha.phase);
@@ -829,12 +933,18 @@ function renderLayers(state) {
   ctx.globalAlpha = aA;
   ctx.drawImage(layers.A, dxA, dyA);
 
+  /* B — breathing only, no drift.
+     Multiply blend: gray grain darkens the composite nonlinearly.
+     Darker grain blocks darken further; lighter blocks have minimal
+     effect. Creates speckled shadow texture. */
   ctx.globalCompositeOperation = cfg.B.blendMode;
   const aB = cfg.B.alpha.base
     + cfg.B.alpha.amplitude * Math.sin(t * cfg.B.alpha.frequency + cfg.B.alpha.phase);
   ctx.globalAlpha = aB;
   ctx.drawImage(layers.B, 0, 0);
 
+  /* C — vertical shimmy, single harmonic.
+     Screen blend: stripes add light against the substrate. */
   ctx.globalCompositeOperation = cfg.C.blendMode;
   const aC = cfg.C.alpha.base
     + cfg.C.alpha.amplitude * Math.sin(t * cfg.C.alpha.frequency + cfg.C.alpha.phase);
@@ -842,6 +952,8 @@ function renderLayers(state) {
   ctx.globalAlpha = aC;
   ctx.drawImage(layers.C, 0, dyC);
 
+  /* D — gentle omnidirectional float.
+     sin/cos pair at different frequencies → elliptical path. */
   ctx.globalCompositeOperation = cfg.D.blendMode;
   const aD = cfg.D.alpha.base
     + cfg.D.alpha.amplitude * Math.sin(t * cfg.D.alpha.frequency + cfg.D.alpha.phase);
@@ -850,6 +962,7 @@ function renderLayers(state) {
   ctx.globalAlpha = aD;
   ctx.drawImage(layers.D, dxD, dyD);
 
+  /* Reset compositing state for next frame / next strip */
   ctx.globalCompositeOperation = 'source-over';
   ctx.globalAlpha = 1.0;
 }
@@ -949,21 +1062,29 @@ function showStaticFallback(container) {
  * Pre-resolve random GIF paths so all strips sharing the same pool
  * get the same randomly selected GIF.
  *
- * Without this, the header divider and footer divider each independently
- * call randomGifPath() and get different GIFs. They should match —
- * they’re the same decorative motif framing the page content.
+ * Problem: without this, the header divider and footer divider each
+ * independently call randomGifPath() and almost always get different
+ * GIFs. Visually they should match — they’re the same decorative motif
+ * framing the page content.
  *
- * Groups all GIF-mode strips by pool parameters (path, prefix, count,
- * pad), picks ONE random GIF per pool, and assigns it to every strip
- * in that pool. Runs before both reduced-motion and normal branches.
+ * Solution: before any processing, collect all GIF-mode strips that
+ * need a random path, group them by their pool parameters (path,
+ * prefix, count, pad), pick ONE random GIF per pool, and assign it
+ * to every strip in that pool.
  *
  * JS CONCEPT: Map used as a grouping structure. The pool key is a
- * concatenated string of the data attributes that define the pool.
- * All containers with the same key share the same random selection.
+ * string built from the data attributes that define the pool. All
+ * containers with the same key share the same random selection.
+ * This runs before both the reduced-motion branch and the normal
+ * processing branch, so the assignment is consistent either way.
  *
  * @param {NodeList|Array} containers - All .threshold-strip elements
  */
 function resolveSharedRandomPaths(containers) {
+  /* Group containers by GIF pool.
+     Layers-mode strips don’t use GIFs — skip them.
+     Strips with an explicit non-random data-src already have
+     their path — skip them too. */
   const pools = new Map();
 
   containers.forEach((container) => {
@@ -973,6 +1094,9 @@ function resolveSharedRandomPaths(containers) {
     const src = container.dataset.src;
     if (src && src !== 'random') return;
 
+    /* Build a key from the pool-defining attributes.
+       Two containers with the same key draw from the same
+       GIF collection and should get the same random pick. */
     const path   = container.dataset.gifPath   || 'assets/img/dividers/';
     const prefix = container.dataset.gifPrefix || 'divider_';
     const count  = container.dataset.gifCount  || String(THRESHOLD_CONFIG.dividerCount);
@@ -985,6 +1109,7 @@ function resolveSharedRandomPaths(containers) {
     pools.get(key).containers.push(container);
   });
 
+  /* Pick one random GIF per pool and assign to all containers. */
   pools.forEach((pool) => {
     const num = Math.floor(Math.random() * pool.count) + 1;
     const padded = String(num).padStart(pool.pad, '0');
@@ -1008,7 +1133,10 @@ async function initThresholdSplits() {
   const containers = document.querySelectorAll('.threshold-strip');
   if (containers.length === 0) return;
 
-  /* Pre-resolve random GIF paths so header + footer dividers match */
+  /* Pre-resolve random GIF paths BEFORE any processing.
+     This ensures all strips sharing the same GIF pool (e.g. the header
+     and footer dividers) get the same randomly selected GIF. Must run
+     before both the reduced-motion branch and the normal branch. */
   resolveSharedRandomPaths(containers);
 
   const prefersReducedMotion = window.matchMedia(
@@ -1020,6 +1148,9 @@ async function initThresholdSplits() {
       const mode = container.dataset.animation || 'threshold';
 
       if (mode === 'layers') {
+        /* Layers mode reduced-motion fallback: load one kit and render
+           a single static frame (E substrate + all layers at base alpha).
+           This gives a static composite rather than a blank rectangle. */
         const kitPath = randomKitPath(container);
         loadKit(kitPath).then((layers) => {
           const canvas = container.querySelector('canvas');
@@ -1027,6 +1158,7 @@ async function initThresholdSplits() {
           canvas.height = layers.E.height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(layers.E, 0, 0);
+          /* Draw remaining layers at base alpha for a representative still */
           const cfg = LAYER_CHOREOGRAPHY;
           ctx.globalCompositeOperation = cfg.A.blendMode;
           ctx.globalAlpha = cfg.A.alpha.base;
@@ -1046,7 +1178,7 @@ async function initThresholdSplits() {
           console.error('layers reduced-motion fallback:', err);
         });
       } else {
-        /* GIF path already resolved by resolveSharedRandomPaths() */
+        /* GIF path already resolved by resolveSharedRandomPaths() above */
         showStaticFallback(container);
       }
     });
@@ -1058,7 +1190,9 @@ async function initThresholdSplits() {
   const processingPromises = Array.from(containers).map(async (container) => {
     // Read animation mode from data attribute; default to 'threshold'
     const mode = container.dataset.animation || 'threshold';
-    /* GIF paths already resolved by resolveSharedRandomPaths() */
+    /* GIF paths already resolved by resolveSharedRandomPaths() above.
+       Layers mode strips were skipped by that function (they load
+       PNG kits, not GIFs). */
     const processor = MODE_PROCESSORS[mode] || MODE_PROCESSORS.threshold;
 
     try {

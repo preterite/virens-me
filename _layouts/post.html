@@ -1,140 +1,91 @@
 ---
 layout: default
+page_type: content
+aria_label: post-title
 ---
 
-<article class="blog-post">
-  <!-- Human-readable section -->
-  <header class="post-header">
-    <h1>{{ page.title }}</h1>
-    <div class="post-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">
-        {{ page.date | date: "%B %-d, %Y" }}
-      </time>
-      {% if page.author %} · {{ page.author }}{% endif %}
-    </div>
-    {% if page.excerpt %}
-    <div class="post-excerpt">
-      {{ page.excerpt }}
-    </div>
-    {% endif %}
-  </header>
+{% comment %}
+  POST LAYOUT — virens.me blog posts.
+  Inherits default.html (two-column with sidebar).
+  Matches _mockup-content.html pattern:
+    post-header → optional series-nav → reading-column → page-nav.
 
-  <div class="post-content">
-    {{ content }}
+  Reading time: ~250 words/minute for academic-ish content.
+{% endcomment %}
+
+{% assign reading_time = content | number_of_words | divided_by: 250 %}
+{% if reading_time < 1 %}{% assign reading_time = 1 %}{% endif %}
+
+<!-- POST HEADER -->
+<section class="post-header">
+  <h1 id="post-title">{{ page.title }}</h1>
+  <div class="post-meta">
+    <span class="post-date">{{ page.date | date: "%B %-d, %Y" }}</span>
+    <span class="separator">&middot;</span>
+    <span class="post-reading-time">{{ reading_time }} min read</span>
   </div>
 
-  <!-- Machine-readable metadata section -->
-  {% if page.show_metadata != false %}
-  <div class="post-metadata">
-    <h2>Post Metadata</h2>
-    
-    {% if page.categories %}
-    <div class="metadata-section">
-      <h4>Categories</h4>
-      <div class="metadata-tags">
-        {% for category in page.categories %}
-        <span class="tag">{{ category }}</span>
-        {% endfor %}
-      </div>
-    </div>
+  {% if page.categories or page.tags %}
+  <div class="post-categories">
+    {% for category in page.categories %}
+    <a href="{{ '/categories/' | relative_url }}#{{ category | slugify }}" class="category-pill">{{ category }}</a>
+    {% endfor %}
+    {% if page.categories and page.tags %}
+    <span class="pill-separator"></span>
     {% endif %}
-
-    {% if page.tags %}
-    <div class="metadata-section">
-      <h4>Tags</h4>
-      <div class="metadata-tags">
-        {% for tag in page.tags %}
-        <span class="tag">#{{ tag }}</span>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    <div class="metadata-section">
-      <h4>Publication Info</h4>
-      <ul class="metadata-list">
-        <li><strong>Published:</strong> {{ page.date | date: "%B %-d, %Y at %-I:%M %p %Z" }}</li>
-        {% if page.last_modified %}
-        <li><strong>Last Updated:</strong> {{ page.last_modified | date: "%B %-d, %Y" }}</li>
-        {% endif %}
-        <li><strong>Permalink:</strong> <code>{{ site.url }}{{ page.url }}</code></li>
-      </ul>
-    </div>
-
-    {% if page.related_posts %}
-    <div class="metadata-section">
-      <h4>Related Posts (virens.me)</h4>
-      <ul class="metadata-list">
-        {% for post_url in page.related_posts limit:3 %}
-        <li><a href="{{ post_url }}">{{ post_url }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-
-    {% if page.related_resources %}
-    <div class="metadata-section">
-      <h4>Related Resources (virens.io)</h4>
-      <ul class="metadata-list">
-        {% for resource in page.related_resources limit:3 %}
-        <li><a href="{{ resource.url }}">{{ resource.title }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-
-    {% if page.external_links %}
-    <div class="metadata-section">
-      <h4>Link Inventory</h4>
-      <ul class="metadata-list">
-        {% for link in page.external_links %}
-        <li><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.title }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-
-    <div class="metadata-section">
-      <h4>Recent GitHub Activity</h4>
-      <ul id="github-activity-post" class="github-activity">
-        <li>Loading...</li>
-      </ul>
-    </div>
-
-    {% if page.trackbacks %}
-    <div class="metadata-section">
-      <h4>Recent Mentions</h4>
-      <ul class="metadata-list">
-        {% for trackback in page.trackbacks limit:3 %}
-        <li><a href="{{ trackback.url }}">{{ trackback.source }}</a> — {{ trackback.date }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
+    {% for tag in page.tags %}
+    <a href="{{ '/tags/' | relative_url }}#{{ tag | slugify }}" class="tag-pill">{{ tag }}</a>
+    {% endfor %}
   </div>
   {% endif %}
 
-  <!-- Comments placeholder -->
-  <div class="post-comments">
-    <h3>Comments</h3>
-    <p><em>Comments system to be implemented. For now, reach out via <a href="{{ '/contact/' | relative_url }}">contact form</a> or <a href="https://github.com/{{ site.github.repository }}/discussions" target="_blank" rel="noopener noreferrer">GitHub Discussions</a>.</em></p>
-  </div>
-</article>
+  {% if page.abstract %}
+  <p class="post-abstract">{{ page.abstract }}</p>
+  {% elsif page.excerpt %}
+  <p class="post-abstract">{{ page.excerpt | strip_html }}</p>
+  {% endif %}
+</section>
 
-<!-- Post navigation -->
-<nav class="post-navigation" style="margin-top: 48px; padding-top: 24px; border-top: 2px solid var(--color-border);">
-  <div style="display: flex; justify-content: space-between;">
-    {% if page.previous %}
-    <div>
-      <small style="color: var(--color-muted);">← Previous</small><br>
-      <a href="{{ page.previous.url | relative_url }}">{{ page.previous.title }}</a>
-    </div>
+{% comment %}
+  SERIES NAV — optional. Set in front matter:
+    series:
+      title: "Building the Visual Layer"
+      posts:
+        - title: "Generating Horizontal Dividers"
+          url: /2026/03/horizontal-divider-generation/
+        - title: "Threshold Split: Luminance Decomposition"
+          current: true
+        - title: "Layer Composite Strips"
+          url: /2026/03/layer-composite-strips/
+{% endcomment %}
+{% if page.series %}
+<div class="series-nav">
+  <p class="series-nav-title">Series: {{ page.series.title }}</p>
+  <ol>
+    {% for item in page.series.posts %}
+    <li>
+      {% if item.current %}
+      <span class="series-current">{{ item.title }}</span>
+      {% else %}
+      <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endif %}
+
+<!-- READING COLUMN — prose container with h2 accent marks -->
+<div class="reading-column">
+  {{ content }}
+
+  <!-- Post navigation — previous/next links -->
+  <nav class="page-nav" aria-label="Previous and next posts">
+    {% if page.previous.url %}
+    <a href="{{ page.previous.url | relative_url }}">&larr; {{ page.previous.title }}</a>
     {% endif %}
-    {% if page.next %}
-    <div style="text-align: right;">
-      <small style="color: var(--color-muted);">Next →</small><br>
-      <a href="{{ page.next.url | relative_url }}">{{ page.next.title }}</a>
-    </div>
+    {% if page.next.url %}
+    <a href="{{ page.next.url | relative_url }}">{{ page.next.title }} &rarr;</a>
     {% endif %}
-  </div>
-</nav>
+  </nav>
+</div>

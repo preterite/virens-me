@@ -6,16 +6,12 @@
   <meta name="description" content="{{ page.description | default: site.description | escape }}">
   <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
 
-  <!-- Font preloads — critical rendering path
-       Preload the three lead fonts to avoid FOUT on first paint.
-       virens.me lead: JetBrains Mono (headings) -->
+  <!-- Font preloads -->
   <link rel="preload" href="{{ '/assets/fonts/JetBrainsMono-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ '/assets/fonts/LibreBaskerville-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ '/assets/fonts/CooperHewitt-Medium.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
 
-  <!-- Styles
-       virens-base.css: shared structure across all three sites (plain CSS).
-       virens-me-theme.css: compiled from SCSS partials in _sass/virens-me/. -->
+  <!-- Styles -->
   <link rel="stylesheet" href="{{ '/assets/css/virens-base.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/css/virens-me-theme.css' | relative_url }}">
 
@@ -26,7 +22,7 @@
   {% feed_meta %}
 </head>
 
-<body data-site="{{ site.site_type }}" data-page-type="{{ page.page_type | default: 'content' }}">
+<body data-site="{{ site.site_type }}" data-page-type="{{ page.page_type | default: 'page' }}">
   <div class="page-wrapper" id="top">
     <a href="#main" class="skip-link">Skip to main content</a>
 
@@ -46,31 +42,17 @@
       <div class="threshold-strip" data-animation="breathe" data-src="random"><canvas></canvas></div>
     </div>
 
-    <!-- MAIN CONTENT — two-column: main + sidebar -->
-    <main id="main" class="layout-content"{% if page.aria_label %} aria-labelledby="{{ page.aria_label }}"{% endif %}>
-      <div class="content-body">
-        <div class="main-content">
-          {{ content }}
-        </div>
-
-        <aside class="content-sidebar">
-          {% if page.sidebar == 'index' %}
-            {% include sidebar-index.html %}
-          {% else %}
-            {% include sidebar-post.html %}
-          {% endif %}
-        </aside>
-      </div>
+    <!-- MAIN CONTENT — single column, no sidebar.
+         Page content defines its own container width
+         (e.g. .about-content at 860px, or .reading-column). -->
+    <main id="main"{% if page.aria_label %} aria-labelledby="{{ page.aria_label }}"{% endif %}>
+      {{ content }}
     </main>
 
     <!-- Divider: content → footer -->
     <div class="divider-full-bleed divider-footer">
       <div class="threshold-strip" data-animation="breathe" data-src="random"><canvas></canvas></div>
     </div>
-
-    <!-- Back-to-top pill — fades in when tagline scrolls out of viewport.
-         Positioned by JS to align with sidebar left edge. -->
-    <a href="#top" class="back-to-top" aria-label="Back to top">&uarr; top</a>
 
     {% include footer.html %}
   </div>

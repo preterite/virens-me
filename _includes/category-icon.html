@@ -1,0 +1,8 @@
+{% comment %}
+  Category Icon Include — renders an inline Lucide SVG for a given category slug.
+  
+  Usage: {% include category-icon.html category="build" %}
+  
+  Looks up the SVG paths in _data/categories.yml.
+  Falls back silently if the category isn't found.
+{% endcomment %}{% assign cat_data = site.data.categories[include.category] %}{% if cat_data %}<svg class="listing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"{% if cat_data.svg_style %} style="{{ cat_data.svg_style }}"{% endif %}>{{ cat_data.svg }}</svg>{% endif %}

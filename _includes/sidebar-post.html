@@ -1,0 +1,52 @@
+<!-- SIDEBAR — POST / CONTENT PAGES
+     Recent posts, layer strip, categories, tagline. -->
+<div class="sidebar-flow">
+
+  <!-- Recent Posts -->
+  <div class="sidebar-section recent-posts">
+    <h3>Recent Posts</h3>
+    <ul>
+      {% for post in site.posts limit:5 %}
+      <li>
+        <a href="{{ post.url | relative_url }}"
+           {% if post.url == page.url %}style="color: var(--color-accent-bright); font-weight: 700;"{% endif %}>
+          {{ post.title }}
+        </a>
+        <span class="post-date-small">{{ post.date | date: "%b %-d, %Y" }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Layer strip — 5-layer PNG composite animation -->
+  <div class="sidebar-section">
+    <div class="threshold-strip"
+         data-animation="layers"
+         data-speed="slow"
+         data-kit-path="assets/img/layer-kits/"
+         data-kit-count="10"><canvas></canvas></div>
+  </div>
+
+  <!-- Categories -->
+  <div class="sidebar-section category-nav">
+    <h3><a href="{{ '/categories/' | relative_url }}">Categories</a></h3>
+    <ul>
+      {% for category in site.categories %}
+      <li>
+        <a href="{{ '/categories/' | relative_url }}#{{ category[0] | slugify }}">
+          {{ category[0] }} <span class="cat-count">{{ category[1].size }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+
+</div>
+
+<!-- Tagline box — outside .toc-sticky so it scrolls naturally to the
+     page bottom rather than being clipped by the sticky container edge.
+     Also serves as the IntersectionObserver sentinel for initBackToTopPill(). -->
+<div class="tagline-box sidebar-section">
+  <p id="tagline-text"></p>
+</div>

@@ -1,19 +1,21 @@
+<!-- HEADER
+     Logo → site title → tagline.
+     Logo links home; title links home.
+     The <p> for site-title avoids duplicate <h1> on pages
+     that have their own <h1>. -->
 <header>
   <div class="header-animation"></div>
-  
   <div class="header-content">
-    <div class="header-text">
-      <h1 id="site-title">
-        <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
-      </h1>
-      <p id="site-description">{{ site.tagline }}</p>
-    </div>
-    
     <div class="header-logo">
-      <img src="{{ site.logo | relative_url }}" 
-           alt="{{ site.title }} logo" 
-           width="{{ site.logo_width }}" 
-           height="{{ site.logo_height }}">
+      <a href="{{ '/' | relative_url }}"><img
+        src="{{ site.logo | relative_url }}"
+        alt="{{ site.title }} — return to home"
+        width="{{ site.logo_width }}"
+        height="{{ site.logo_height }}"></a>
+    </div>
+    <div class="header-text">
+      <p id="site-title"><a href="{{ '/' | relative_url }}">{{ site.title }}</a></p>
+      <p id="site-description">{{ site.tagline }}</p>
     </div>
   </div>
 </header>

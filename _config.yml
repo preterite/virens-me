@@ -10,9 +10,9 @@ baseurl: ""
 
 # Site identity
 site_type: "virens-me"
-logo: "/assets/img/virens-logo.svg"
+logo: "/assets/img/devblog-logo-outlines.svg"
 logo_width: 296
-logo_height: 222
+logo_height: 120
 
 # Author
 author:
@@ -83,12 +83,12 @@ feed:
 
 # GitHub
 github:
-  repository: preterite/SRE
+  repository: preterite/virens-me
   branch: main
 
 # Social
 social:
-  github: preterite/SRE
+  github: preterite/virens-me
 
 # Post defaults
 defaults:
